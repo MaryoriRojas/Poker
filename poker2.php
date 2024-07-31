@@ -33,28 +33,32 @@ function evaluarMano($mano) {
 
     $cuentaNumeros = array_count_values($numeros);
     $cuentaSimbolos = array_count_values($simbolos);
-    
+
+    $resultados = [];
+
     // Verificar pares, tríos y full house
     $pares = 0;
     $trios = 0;
+    $fullHouse = false;
     foreach ($cuentaNumeros as $numero => $cantidad) {
         if ($cantidad == 2) {
             $pares++;
+            $resultados[] = "Par de $numero: " . implode(', ', array_filter($mano, function($carta) use ($numero) {
+                return strpos($carta, $numero) !== false;
+            }));
         } elseif ($cantidad == 3) {
             $trios++;
+            $resultados[] = "Trío de $numero: " . implode(', ', array_filter($mano, function($carta) use ($numero) {
+                return strpos($carta, $numero) !== false;
+            }));
         }
     }
-    
+
     if ($trios == 1 && $pares == 1) {
-        return "Full House";
-    } elseif ($trios == 1) {
-        return "Trío";
-    } elseif ($pares == 2) {
-        return "Dos pares";
-    } elseif ($pares == 1) {
-        return "Par";
+        $fullHouse = true;
+        $resultados[] = "Full House";
     }
-    
+
     // Verificar escalera
     $indices = array_map(function($numero) {
         global $numeros;
@@ -69,15 +73,19 @@ function evaluarMano($mano) {
         }
     }
     if ($escalera) {
-        return "Escalera";
+        $resultados[] = "Escalera: " . implode(', ', $mano);
     }
 
     // Verificar color
     if (count($cuentaSimbolos) == 1) {
-        return "Color";
+        $resultados[] = "Color: " . implode(', ', $mano);
     }
 
-    return "Carta alta";
+    if (empty($resultados)) {
+        $resultados[] = "Carta alta: " . max($numeros) . " de " . $simbolos[array_search(max($numeros), $numeros)];
+    }
+
+    return implode("\n", $resultados);
 }
 
 // Función para mostrar el menú
@@ -113,7 +121,7 @@ function principal() {
                     echo "No hay cartas en la mano para evaluar.\n";
                 } else {
                     $resultado = evaluarMano($mano);
-                    echo "Resultado de la evaluación: $resultado\n";
+                    echo "Resultado de la evaluación:\n$resultado\n";
                 }
                 break;
             case 4:
