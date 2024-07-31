@@ -88,6 +88,15 @@ function evaluarMano($mano) {
     return implode("\n", $resultados);
 }
 
+// Función para determinar el color de una carta
+function colorCarta($simbolo) {
+    if ($simbolo == 'Corazones' || $simbolo == 'Diamantes') {
+        return 'Rojo';
+    } else {
+        return 'Negro';
+    }
+}
+
 // Función para mostrar el menú
 function mostrarMenu() {
     echo "1. Crear nuevo mazo\n";
@@ -115,6 +124,11 @@ function principal() {
                 $numCartas = readline("¿Cuántas cartas repartir? ");
                 $mano = repartirCartas($mazo, $numCartas);
                 echo "Cartas repartidas: " . implode(', ', $mano) . "\n";
+                foreach ($mano as $carta) {
+                    $partes = explode(' ', $carta);
+                    $color = colorCarta($partes[2]);
+                    echo "$carta - $color\n";
+                }
                 break;
             case 3:
                 if (empty($mano)) {
